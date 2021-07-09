@@ -1,0 +1,32 @@
+version: '3'
+services:
+  mysql:
+    build:
+      context: ./docker/mysql
+    ports:
+      - "6033:3306"
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: password
+      MYSQL_DATABASE: timezone
+      MYSQL_USER: user
+      MYSQL_PASSWORD: password
+    volumes:
+      - ./docker/mysql/scripts:/docker-entrypoint-initdb.d:rw
+      - mysql_data:/var/lib/mysql
+  nginx:
+    build:
+      context: ./docker/nginx
+    volumes:
+      - ./:/app
+    depends_on:
+      - php-fpm
+    ports:
+      - "8080:80"
+  php-fpm:
+    build:
+      context: ./docker/php-fpm
+    volumes:
+      - ./:/app
+volumes:
+  mysql_data:
